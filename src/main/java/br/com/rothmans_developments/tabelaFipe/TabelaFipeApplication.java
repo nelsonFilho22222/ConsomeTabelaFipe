@@ -18,6 +18,5 @@ public class TabelaFipeApplication implements CommandLineRunner {
 		MenuManager menu = new MenuManager();
 		menu.exibeMenu();
 
-
 	}
 }

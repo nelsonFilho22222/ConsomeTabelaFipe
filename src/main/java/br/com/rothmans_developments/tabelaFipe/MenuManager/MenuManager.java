@@ -1,7 +1,11 @@
 package br.com.rothmans_developments.tabelaFipe.MenuManager;
 
+import br.com.rothmans_developments.tabelaFipe.model.Dados;
+import br.com.rothmans_developments.tabelaFipe.model.Modelos;
 import br.com.rothmans_developments.tabelaFipe.service.ConsumoApi;
+import br.com.rothmans_developments.tabelaFipe.service.ConverteDados;
 
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class MenuManager {
@@ -10,16 +14,22 @@ public class MenuManager {
 
     private ConsumoApi consumo = new ConsumoApi();
 
+    private ConverteDados conversor = new ConverteDados();
+
     private final String  URL_BASE = "https://parallelum.com.br/fipe/api/v1/";
 
 
     public void exibeMenu() {
         var menu = """
                 *** OPÇÔES ***
-                Carro
-                Moto
-                Caminhão
-                
+         
+                |----------------------------|
+                |Carro                       |
+                |Moto                        |
+                |Caminhão                    |
+                |----------------------------|
+          
+          
                 Digite uma das opções para consulta
                 """;
 
@@ -38,5 +48,23 @@ public class MenuManager {
         var json = consumo.obterDados(endereco);
         System.out.println(json);
 
+        var marcas = conversor.obterLista(json, Dados.class);
+        marcas. stream().
+                sorted(Comparator.comparing(Dados::codigo)).
+                forEach(System.out::println);
+
+        System.out.println("Informe o codigo da marca para consulta");
+        var codigoMarca = leitura.nextLine();
+
+
+        endereco = endereco + "/" + codigoMarca + "/modelos";
+        json = consumo.obterDados(endereco);
+        var modelosLista = conversor.obterDados(json, Modelos.class);
+
+
+        System.out.println("\n Modelos dessa marca: ");
+        modelosLista.modelos().stream()
+                .sorted(Comparator.comparing(Dados::codigo))
+                .forEach(System.out::println);
     }
 }
